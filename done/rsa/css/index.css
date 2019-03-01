@@ -1,0 +1,39 @@
+html {font-size: 100%;}
+* {
+  font-family : Arial, Helvetica, sans-serif;
+  font-size : 1em;
+}	
+body {
+	position:relative;
+	width:100%;
+	height:100%;
+	margin:auto;
+}
+/*
+Le point d'origine de la <div> main est toujours
+centré dans la page du navigateur.
+Note: le centrage vertical est assuré par du JS.
+*/
+#main {
+	position:relative;
+	overflow-x:auto ;
+	
+	/*margin-top:50%;*/
+	background-color:#eee;
+	display:block;
+	/*border: 1px solid black;*/
+	
+}
+
+
+#info {
+	padding:10px;
+}
+
+hr {
+}
+                                                                    
+hr.clear {
+	clear: both;
+	visibility: hidden;
+}
