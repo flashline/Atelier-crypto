@@ -1,5 +1,6 @@
 # Atelier Silex  2019  
-#  Chiffrements avec clé secrète symétrique ou avec clés publique et privée (RSA)
+## Atelier n° 1 : Chiffrement avec clé secrète.
+##  Atelier n° 2 : Chiffrement avec clés publique et privée (RSA)
 
 Nous allons voir en premier le chiffrement/déchiffrement d'un message avec une même clé secrète puis avec le système RSA qui utilise une clé publique pour chiffrer et une clé privée pour déchiffrer.
 
