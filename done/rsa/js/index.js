@@ -1,61 +1,79 @@
 //main
 var start=Date.now();
 // Init vars and public key creation by Alice
-log("*** Alice initialisation ***"); 
-var p = 239 ; const by=2 ; //20063 ; //use with by=3 //503 ; //use with by=2 //67 ; //use with by=1 //239 ; //use with by=2 ; 
-var q = 293 ; 			   //25633 ; //use with by=3 //563 ; //use with by=2 //41 ; //use with by=1 //293 ; //use with by=2 ; 
+log("*** Création de la clé publique par Alice ***"); 
+var p = 239 ; //20063 ; //use with by=3 and len16=8 //503 ; //use with by=2 and len16=5 //239 ; //use with by=2 and len16=5 ; 
+var q = 293 ; //25633 ; //use with by=3 and len16=8 //563 ; //use with by=2 and len16=5 //293 ; //use with by=2 and len16=5 ; 
 var n = p*q ;
-const len16=5; // len of hexa bloc. (16^len16 > n) (i.e. 16^5 = 1,048,576 > n)
+const by=2 ;
+const len16=5; // len of hexa bloc. (16^len16 > n) 
 var phi= phiOf (p,q) ;
 var e=primeOf(phi,p,q);
 // Alice give public key to Bob.
-log("Alice give public key to Bob");
-log("Public key (e , p*q) = ("+e+" , "+(n)+")");
-// test if bloc are smaller than n
+log("Alice donne la clé publique à Bob");
+log("Clé publique  = ("+e+" , "+n+")");   
+// test if bloc are less than n
 if (Math.pow(256,by)>n) {
 	var str="Public key n="+n+" too small !";
 	log(str );
 	throw(str);
 }
-log("*** Bob create, cipher end send message to Alice ***"); 
+// test if 16^len16 are greater than n
+if (Math.pow(16,len16)<n) {
+	var str="Hexa string length len16="+len16+" too small !";
+	log(str );
+	throw(str);
+}
+//////////////////////////
+//breakPoint();
+//////////////////////////
+log("*** Bob crée, chiffre et envoie son message to Alice ***"); 
 // create plain text
 var plainTxt="Help me !";
-log("Plain text : <b>"+plainTxt+"</b>");
+log("Message en clair : <b>"+plainTxt+"</b>");
 //
 // Store and group plain text in array
 var arrBy= toArrayOfBy(plainTxt,by);
-log("Plain text grouped by "+by+" 16 bits elements array : ");
+log("Tableau des caractères groupés 2 par 2 (16 bits)");
 logArr(arrBy);
 //
 // ciphering
 var cipherArr=cipher (arrBy,e,n);
-log("Ciphered text array : ");
+log("Tableau chiffré : ");
 logArr(cipherArr);
 //
 // Store cipher array in hexa string blocs
 var cipheredTxt=toHexaString(cipherArr,len16);
-log("Ciphered hexa string of "+len16+" digits  : ");
+log("Message chiffré sous forme d'une chaine hexadécimale  : ");
 log16(cipheredTxt,len16);
-//
-log("*** Alice receive message  ***"); 
+//////////////////////////
+//breakPoint();
+//////////////////////////
+log("*** Alice calcul l'élément d de sa clé secrète  ***"); 
 // compute d (private key with n)
 var d=dCompute(phi,p,q,e);
 log("d est égal à "+d);
-//
+//////////////////////////
+//breakPoint();
+//////////////////////////
+log("*** Alice reçoit et déchiffre le message  ***"); 
 // Convert ciphered hexa string to decimal array
 var decArr=toDecArray(cipheredTxt,len16);
-log("Ciphered text converted to decimal array (must be equal to ''Ciphered text array'' above) : ");
+log("Conversion de la chaine hexa en tableau (doit être égal 'Tableau chiffré' ci-dessus) : ");
 logArr(decArr);
 //
 // unciphering
-uncipherArr=uncipher(decArr,d,(p*q)) ;
-log("Unciphered text array : ");
+var uncipherArr=uncipher(decArr,d,n) ;
+log("Tableau déchiffré (doit être égal à 'Tableau des caractères groupés 2 par 2' ci-dessus) ");
 logArr(uncipherArr);
 //
 // Convert unciphered text to plain text
 var unciphText=arrayByToString(uncipherArr,by);
-log("Unciphered text : (must be equal to ''Plain text'' above) : <b>"+unciphText+"</b>");
+log("Message déchiffré (doit être égal 'Message en clair' ci-dessus)  : <b>"+unciphText+"</b>");
+//
+/**/
 log("Duration="+((Date.now()-start)/1000)+" sec.");
+
 //
 //
 //functions
@@ -78,13 +96,13 @@ function phiOf (pp,qq) {
 */
 function primeOf(phii,pp,qq) {
 	// TODO
-	var min=Math.max(pp,qq)+1;
-	/*if (min==null || phii==null || phi<=min) {
+	var start=Math.max(pp,qq)+1;
+	/*if (start==null || phii==null || phi<=start) {
 		var str="error in primeOf (phi,p,q) = ("+phii+","+pp+","+qq+")";
 		log(str );
 		throw(str);
 	}*/
-	for (var ee=min;ee<phii;ee++) {
+	for (var ee=start;ee<phii;ee++) {
 		if (GCD(phii,ee)==1) break;
 	}
 	return ee;
@@ -96,20 +114,12 @@ function primeOf(phii,pp,qq) {
 * @return the GCD
 */
 function GCD (a,b) {
-	// TODO
-	/*
-	if (a==null || b==null || a<=b) {
-		var str="error in GCD (a,b) = ("+a+","+b+")";
-		log(str );
-		throw(str);
-	}*/
-	var r=a%b;
-	//log("(r,a,b)="+"("+r+","+a+","+b+")");
+	// TODO	
+	var r=a%b;	
 	while (r!=0) {
 		a=b;	
 		b=r; 
-		r=a%b;
-		//log("(r,a,b)="+"("+r+","+a+","+b+")");
+		r=a%b;		
 	}
 	return b;
 }
@@ -140,17 +150,26 @@ function toArrayOfBy (str,by) {
 */
 function cipher (arr,ee,nn) {
 	// TODO
-	BigNumber.config({ RANGE: 1000000000 });
+	BigNumber.config({ RANGE: 10000000 }); // 10 millions
 	BigNumber.config({ POW_PRECISION: 0 }) ; // No limit of significative digits
 	var arrOut=[];
 	for (var i in arr) {
-		var cp=arr[i];
-		var v=cp.pow(e);
-		var cc=v.mod(nn) ;		
-		arrOut.push(cc);
+		var pc=new BigNumber(arr[i]);
+		var cc=pc.pow(ee).mod(nn);	// var cc=Math.pow(pc,ee) % nn ;
+		arrOut.push(cc.toNumber());	
 	}	
 	return arrOut;
 }
+/* 
+// Its better to use the same algorithme than uncipher()
+function cipher (arr,ee,nn) {
+	var arrOut=[];
+	for (var i in arr) {			
+		arrOut.push(powMod(arr[i],ee,nn));		
+	}	
+	return arrOut;
+}
+*/
 /**
 * Creation of an hexa string before send ciphered text
 * @param  arr 		A text string 
@@ -180,22 +199,38 @@ function toHexaString (arr,len16) {
 * @param phii	(p-1) * (q-1) 
 * @param pp		first prime number p
 * @param qq		second prime number q
-* @param e		Number e (idem in public key)
+* @param ee		Number e (idem in public key)
 * @return the d number
 */
-function dCompute(phii,pp,qq,e) {
+function dCompute(phii,pp,qq,ee) {
 	// TODO
-	var min=Math.max(pp,qq)+1;
-	if (min==null || phii==null || phi<=min) {
-		var str="error in  dCompute(phi,p,q) = ("+phii+","+pp+","+qq+")";
-		log(str );
-		throw(str);
-	}
-	for (var dd=min;dd<(p*q);dd++) {
-		if ((e*dd)%phii==1) break;
+	var start=Math.max(pp,qq)+1;	
+	for (var dd=start;dd<(p*q);dd++) {
+		if ((ee*dd)%phii==1) break;
 	}
 	return dd;
 }
+/*
+// Better alternative to find 'd' :
+// pp and qq parameters are not used. They are present only for compatibility with dCompute call. 
+function dCompute(phii,pp,qq,ee) {
+	return extendedEuclide(ee,phii)%phii;
+}
+function extendedEuclide(a,b) {
+	x=1 ; var xx=0;
+	var y=0; var yy=1;	
+	while (b!=0) {
+		var q=Math.floor(a/b);
+		var o=store(a%b,b); a=o.v2 ; b=o.v1 ;
+		var o=store(x-q*xx,xx); x=o.v2 ; xx=o.v1 ;
+		var o=store(y-q*yy,yy); y=o.v2 ; yy=o.v1 ;		
+	}
+	return x;
+}
+function store(v1,v2) {
+	return {v1:v1,v2:v2};
+}
+*/
 /**
 * Convert hexa string ciphered text into array
 * @param  str 		hexa string
@@ -204,7 +239,7 @@ function dCompute(phii,pp,qq,e) {
 */
 function toDecArray (str,len16) {
 	var arr=[];
-	for (var i=0;i< str.length ; i+=len16) { // i target the first right digit of hexa string
+	for (var i=0;i< str.length ; i+=len16) { // i target the first left digit of hexa string
 		var str16=str.substr(i,len16);			// get the hexa string of 5 digits
 		var v=Number('0x'+str16) ;				// convert to decimal
 		arr.push(v);							// store in returned array
@@ -220,19 +255,30 @@ function toDecArray (str,len16) {
 */
 function uncipher (arr,dd,nn) {
 	// TODO
-	BigNumber.config({ RANGE: 1000000000 }); // Number of significative digits
-	BigNumber.config({ POW_PRECISION: 0 }) ; // No limit of significative digits		
 	var arrOut=[];
-	for (var i in arr) {
-		var cc=new BigNumber(arr[i]);
-		var v=cc.pow(d);
-		var pc=v.mod(nn) ;	
-		//log("pc.toNumber()="+pc.toNumber());
-		arrOut.push(pc.toNumber());
+	for (var i in arr) {				
+		arrOut.push(powMod(arr[i],dd,nn)); // arrOut.push(Math.pow(arr[i],dd) % nn) ;
 	}	
 	return arrOut;
 }
-
+/**
+* Cipher or uncipher one char
+* @param ic		input char (unciphered or ciphered )
+* @param ed		key 		(e or d)
+* @param nn		Number n (p*q)
+* @return 		output char (ciphered or unciphered)
+*/
+function powMod (ic,ed,nn) {	
+	// TODO
+	var oc=1;
+	ic=new BigNumber(ic);
+	while(ed>0) {
+		if (ed%2!=0) oc=ic.times(oc).mod(nn); // oc = (ic * oc) % nn	
+		ic=ic.times(ic).mod(nn); // ic = ic * ic
+		ed=Math.floor(ed/2);		
+	}
+	return oc;
+}
 /**
 * Reconstruction of plain text
 * @param  arr 		Unciphered array
@@ -276,5 +322,11 @@ function logArr (arr) {
 function $ (id) { 
 	return document.getElementById(id);
 }
+function breakPoint () {
+	var str="Break point";
+	log(str);
+	throw(str);
+}
+
 
 
