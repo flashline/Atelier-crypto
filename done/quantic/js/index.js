@@ -571,6 +571,6 @@ function $$ (str,all="",parent=null) {
 }
 
 function resize() {
-   $("buttons").style.top=""+(window.innerHeight / 2 +400)+"px";   
+   $("buttons").style.top=""+(100)+"px";   
  }
 // toolsBox

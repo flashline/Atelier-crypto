@@ -6,7 +6,7 @@ table.bits th{width:15px;}
 th{border:1px solid black;}
 #summary{display:none;}
 tr.diffBase th,tr.global th{color:#bbb;}
-#buttons{position:absolute;width:100%;height:100%;margin-left:10%;font-size:.8rem;}
+#buttons{position:relative;width:100%;height:100%;margin-left:10%;font-size:.8rem;}
 #proto{display:none;}
 #info{padding:10px;}
 hr{}

@@ -24,6 +24,7 @@ if (Math.pow(16,len16)<n) {
 	log(str );
 	throw(str);
 }
+log();
 //////////////////////////
 breakPoint();
 //////////////////////////
@@ -33,8 +34,8 @@ var plainTxt="Help me !";
 log("Message en clair : <b>"+plainTxt+"</b>");
 //
 // Store and group plain text in array
-var arrBy= toArrayOfBy(plainTxt,by);
-log("Tableau des caractères groupés 2 par 2 (16 bits)");
+var arrBy= stringToArrayBy(plainTxt,by);
+log("Tableau des caractères groupés "+by+" par "+by+" ("+(by*8)+" bits)");
 logArr(arrBy);
 //
 // ciphering
@@ -46,6 +47,7 @@ logArr(cipherArr);
 var cipheredTxt=toHexaString(cipherArr,len16);
 log("Message chiffré sous forme d'une chaine hexadécimale  : ");
 log16(cipheredTxt,len16);
+log();
 //////////////////////////
 breakPoint();
 //////////////////////////
@@ -53,6 +55,7 @@ log("*** Alice calcul l'élément d de sa clé secrète  ***");
 // compute d (private key with n)
 var d=dCompute(phi,p,q,e);
 log("d est égal à "+d);
+log();
 //////////////////////////
 breakPoint();
 //////////////////////////
@@ -64,7 +67,7 @@ logArr(decArr);
 //
 // unciphering
 var uncipherArr=uncipher(decArr,d,n) ;
-log("Tableau déchiffré (doit être égal à 'Tableau des caractères groupés 2 par 2' ci-dessus) ");
+log("Tableau déchiffré (doit être égal à 'Tableau des caractères groupés "+by+" par "+by+" ci-dessus) ");
 logArr(uncipherArr);
 //
 // Convert unciphered text to plain text
@@ -83,7 +86,7 @@ log("Duration="+((Date.now()-start)/1000)+" sec.");
 * @return Phi
 */
 function phiOf (pp,qq) {
-	// TODO	
+	// TODO
 }
 
 /**
@@ -95,7 +98,6 @@ function phiOf (pp,qq) {
 */
 function primeOf(phii,pp,qq) {
 	// TODO
-	
 }
 /**
 * Compute the Greatest Common Denominator between a and b
@@ -105,7 +107,6 @@ function primeOf(phii,pp,qq) {
 */
 function GCD (a,b) {
 	// TODO	
-	
 }
 /**
 * Creation of an array of 2 bytes elements
@@ -113,16 +114,16 @@ function GCD (a,b) {
 * @param  by		Number of  bytes (by=2) 					
 * @return An array of 16 bits elements
 */
-function toArrayOfBy (str,by) {
+function stringToArrayBy (str,by) {
 	var arrOut=[]; var c=0;	
 	for (i=0;i<str.length;i++) {
 		c=c*256+str.substr(i,1).charCodeAt(0) ;
 		if (i%by==(by-1)) {
-			arrOut.push(new BigNumber(c));	
+			arrOut.push(c);	
 			c=0;
 		}		
 	}
-	if (c!=0) arrOut.push(new BigNumber(c));	
+	if (c!=0) arrOut.push(c); 
 	return arrOut;	
 }
 /**
@@ -134,7 +135,6 @@ function toArrayOfBy (str,by) {
 */
 function cipher (arr,ee,nn) {
 	// TODO
-	
 }
 /* 
 // Its better to use the same algorithme than uncipher()
@@ -180,7 +180,6 @@ function toHexaString (arr,len16) {
 */
 function dCompute(phii,pp,qq,ee) {
 	// TODO
-	
 }
 /*
 // Better alternative to find 'd' :
@@ -227,7 +226,6 @@ function toDecArray (str,len16) {
 */
 function uncipher (arr,dd,nn) {
 	// TODO
-
 }
 /**
 * Cipher or uncipher one char
@@ -238,7 +236,6 @@ function uncipher (arr,dd,nn) {
 */
 function powMod (ic,ed,nn) {	
 	// TODO
-	
 }
 /**
 * Reconstruction of plain text
@@ -262,7 +259,8 @@ function arrayByToString (arr,by) {
 	return str;
 }
 //util func
-function log (o) {
+
+function log (o="") {
 	$("info").innerHTML+=o+"<br/>";
 }
 function log16 (hexa,len16) {

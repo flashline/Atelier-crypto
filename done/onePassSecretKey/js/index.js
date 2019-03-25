@@ -1,46 +1,54 @@
 //main
 //
-log("*** Alice initialisation, key creation and Send message to Bob ***");
-// Number of bytes per bloc
-const by=4; // 32bits 
+log("*** Alice crée son message en clair. ***");
 // text to be ciphered
 var plainTxt="Help me !"; // "Toujours avec le principe de substitution, le bon vieux César y a mis sa patte";//"Help me !"; // 9 chars
-log("Plain text : <b>"+plainTxt+"</b>");
+log("Texte clair : <b>"+plainTxt+"</b>");
+log();
+log("*** Création de la clé (de même longueur que le message) par Alice qu'elle enverra à Bob ***");
+// Number of bytes per bloc
+const by=4; // 32bits 
 //
 // key creation
 // var key="$^ù*)=}|a"; // OR
 var o=createKey (plainTxt.length);
 var key=o.key;
-var binKey=o.binKey;
-log("Key bin : "+binKey);
-log("Key text : "+key);
-// 
+var binKey=o.binKey; 
+log("Clé affichée en binaire : "+binKey);
+log("Clé utilisée : "+key);
+log();
 //
+// breakPoint();
+// 
 // Convert plain text to array of 4 bytes elements
-var arrBy= toArrayOfBy(plainTxt,by);
-log("Plain text grouped by "+by+" decimal array : ");
+var arrBy= stringToArrayBy(plainTxt,by);
+log("*** Alice regroupe les caractères "+by+" par "+by+" ("+by*8+" bits) dans un tableau");
 logArr(arrBy);
 //
 // Convert key to array of 4 bytes elements
-var keyBy=toArrayOfBy(key,by);
-log("Key grouped by "+by+" decimal array : ");
+var keyBy=stringToArrayBy(key,by);
+log("Les caractères de la clé sont aussi regroupés par "+by);
 logArr(keyBy);
 //
 // Ciphering
 var cipherArr=cipher (arrBy,keyBy);
-log("Ciphered grouped by "+by+" decimal array : ");
+log("Le tableau est chiffré : ");
 logArr(cipherArr);
+log();
+//
+//breakPoint();
+// 
 //
 // Alice has given key to Bob
 //
-log("*** Bob  receive message  ***"); 
+log("*** Bob  reçoit le message et le déchiffre avec la même clé ***"); 
 // Unciphering
 uncipherArr=uncipher(cipherArr,keyBy);
-log("Unciphered grouped by "+by+" decimal array (must be equal to plain text decimal array above)  : ");
+log("Tableau déchiffré (doit être égal au tableau 'avant chiffrement' ci-dessus)  : ");
 logArr(uncipherArr);
 // Uncipher array to string
 var unciphText=arrayByToString (uncipherArr,by) ;
-log("Unciphered text (must be equal to plain text above) : <b>"+unciphText+"</b>");
+log("Text déchiffré (doit être égal au texte initial d'Alice ci-dessus) : <b>"+unciphText+"</b>");
 //functions
 /**
 * Random key creation
@@ -50,6 +58,7 @@ log("Unciphered text (must be equal to plain text above) : <b>"+unciphText+"</b>
 *				binKey 	binary string of key (only to display it)
 */
 function createKey (len) {
+	//TODO
 	var key="";var binKey8=""; var binKey=""; var splitter=".";
 	for (i=0;i<len*8;i++) {		
 		var bit=random();
@@ -67,16 +76,17 @@ function createKey (len) {
 	return {binKey:binKey,key:key};
 }
 function random () {
+	//TODO
 	return Math.floor(Math.random() * 2);
 };
 
 /**
-* Creation of an aray of 4 bytes (32 bits) elements
+* Creation of an array of 4 bytes (32 bits) elements
 * @param  str 		A text string (message or key)
 * @param  by		Number of  bytes (by=4) 					
 * @return An array of 32 bits elements
 */
-function toArrayOfBy (str,by) {
+function stringToArrayBy (str,by) {
 	var arrOut=[]; var c=0;	
 	for (i=0;i<str.length;i++) {
 		c=c*256+str.substr(i,1).charCodeAt(0) ;
@@ -94,11 +104,11 @@ function toArrayOfBy (str,by) {
 * @return Ciphered message in 32 bits elements array
 */
 function cipher (msgArr,keyArr) {
+	// TODO
 	var arrOut=[]; var j=0;
 	for (var i in msgArr) {
 		if (j>keyArr.length-1) j=0 ;
 		arrOut.push((msgArr[i] ^ keyArr[j]));
-		//log("msgArr[i]="+msgArr[i]+" / keyArr[j]="+keyArr[j]);
 		j++;
 	}
 	return arrOut;
@@ -110,11 +120,11 @@ function cipher (msgArr,keyArr) {
 * @return Unciphered message in 32 bits elements array
 */
 function uncipher (cipherArr,keyArr) {
+	//TODO
 	var arrOut=[]; var j=0;
 	for (var i in cipherArr) {
 		if (j>keyArr.length-1) j=0 ;
 		arrOut.push((cipherArr[i] ^ keyArr[j]));
-		//log("cipherArr[i]="+cipherArr[i]+" / keyArr[j]="+keyArr[j]);
 		j++;
 	}
 	return arrOut;
@@ -141,7 +151,7 @@ function arrayByToString (arr,by) {
 	return str;
 }
 //util func
-function log (o) {
+function log (o="") {
 	$("info").innerHTML+=o+"<br/>";
 }
 function logArr (arr) {
@@ -153,4 +163,10 @@ function logArr (arr) {
 function $ (id) { 
 	return document.getElementById(id);
 }
+function breakPoint () {
+	var str="Break point";
+	log(str);
+	throw(str);
+}
+
 
