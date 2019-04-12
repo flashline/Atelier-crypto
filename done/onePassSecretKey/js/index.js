@@ -2,7 +2,7 @@
 //
 log("*** Alice crée son message en clair. ***");
 // text to be ciphered
-var plainTxt="Help me !"; // "Toujours avec le principe de substitution, le bon vieux César y a mis sa patte";//"Help me !"; // 9 chars
+var plainTxt="Please Help me !"; // "Toujours avec le principe de substitution, le bon vieux César y a mis sa patte";//"Help me !"; // 9 chars
 log("Texte clair : <b>"+plainTxt+"</b>");
 log();
 log("*** Création de la clé (de même longueur que le message) par Alice qu'elle enverra à Bob ***");
@@ -49,6 +49,8 @@ logArr(uncipherArr);
 // Uncipher array to string
 var unciphText=arrayByToString (uncipherArr,by) ;
 log("Text déchiffré (doit être égal au texte initial d'Alice ci-dessus) : <b>"+unciphText+"</b>");
+//
+
 //functions
 /**
 * Random key creation
@@ -59,22 +61,21 @@ log("Text déchiffré (doit être égal au texte initial d'Alice ci-dessus) : <b
 */
 function createKey (len) {
 	//TODO
-	var key="";var binKey8=""; var binKey=""; var splitter=".";
+	var key="";var binKey8=""; var binKey=""; var k=0;
 	for (i=0;i<len*8;i++) {		
 		var bit=random();
-		binKey8+=""+bit; // binKey8+= String(bit);
+		var k=k+bit; 
+		binKey8+= bit.toString() ; // binKey8+=""+bit; // binkey+=String(bit);
 		if ( i%8==7) {
-			if (i==(len*8)-1) splitter="";
-			var c = parseInt(binKey8, 2);
-			key+=String.fromCharCode(c);
-			binKey+=binKey8+splitter;			
-			binKey8="";
+			key+=String.fromCharCode(k);
+			binKey+=binKey8+"."; binKey8="";
+			k=0;
 		}
+		k=k<<1; // k*=2;
 	}	
-	//log("len key="+key.length);
-	//log("len binKey8="+binKey.length);
 	return {binKey:binKey,key:key};
 }
+
 function random () {
 	//TODO
 	return Math.floor(Math.random() * 2);
@@ -87,9 +88,10 @@ function random () {
 * @return An array of 32 bits elements
 */
 function stringToArrayBy (str,by) {
+	// To explain
 	var arrOut=[]; var c=0;	
 	for (i=0;i<str.length;i++) {
-		c=c*256+str.substr(i,1).charCodeAt(0) ;
+		c=(c<<8)+str.substr(i,1).charCodeAt(0); // (c*256)
 		if (i%by==(by-1)) {
 			arrOut.push(c);	c=0;
 		}		
@@ -97,6 +99,7 @@ function stringToArrayBy (str,by) {
 	if (c!=0) arrOut.push(c);	
 	return arrOut;	
 }
+
 /**
 * Ciphering 
 * @param  msgArr 			Message's 32 bits elements array
@@ -120,14 +123,8 @@ function cipher (msgArr,keyArr) {
 * @return Unciphered message in 32 bits elements array
 */
 function uncipher (cipherArr,keyArr) {
-	//TODO
-	var arrOut=[]; var j=0;
-	for (var i in cipherArr) {
-		if (j>keyArr.length-1) j=0 ;
-		arrOut.push((cipherArr[i] ^ keyArr[j]));
-		j++;
-	}
-	return arrOut;
+	//TODO	
+	return cipher (cipherArr,keyArr) ;
 }
 /**
 * Reconstruction of plain text
@@ -136,20 +133,22 @@ function uncipher (cipherArr,keyArr) {
 * @return Original text reconstituted
 */
 function arrayByToString (arr,by) {
+	// To Explain
 	var str=""; var strBy=""; var c;
 	for (var i=0;i<arr.length;i++) {
 		var nBy=arr[i];	
-		for (var j=0;j<by;j++) {
-			c=nBy%256; 								// extract current right byte value
+		for (var j=0;j<by;j++) {				
+			 c=nBy & parseInt("11111111",2); 		// extract current right byte value // c=nBy&255 ; // c=nBy%256; /* c=nBy & parseInt("11111111",2); //because 11111111 binary == 255 */
 			if (c!=0) {  
-				strBy=String.fromCharCode(c)+strBy; // put char at the left of tmp string
-				nBy=Math.floor(nBy/256);			// suppress right byte
+				strBy=String.fromCharCode(c)+strBy; // put char at the left of tmp string													
+				nBy=nBy>>8; 						// suppress right byte // nBy=Math.floor(nBy/256); 
 			 }
 		}
 		str+=strBy;strBy="";
 	}
 	return str;
 }
+
 //util func
 function log (o="") {
 	$("info").innerHTML+=o+"<br/>";

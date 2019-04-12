@@ -25,7 +25,8 @@ Si vous n'avez pas d'éditeur de texte installez :
 # Liens pour aller plus loin ou utilisés durant l'atelier : 
 
 [Clé unique](https://www.lavachequicode.fr/cryptographie/cle-a-usage-unique)  
-[Théorème de Shannon](http://www.acrypta.com/telechargements/fichecrypto_300.pdf])  
+[Théorème de Shannon](http://www.acrypta.com/telechargements/fichecrypto_300.pdf) 
+[Risque si réutilisation de la même clé](https://cryptosmith.com/2008/05/31/stream-reuse/)
 [Théorème d'Euclide pour PGCD](https://fr.wikipedia.org/wiki/Algorithme_d'Euclide)  
 [Algo RSA](http://culturemath.ens.fr/maths/pdf/nombres/RSA.pdf)  
 [Convertisseur décimal, hexa, binaire](http://sebastienguillon.com/test/javascript/convertisseur.html)  

@@ -158,7 +158,7 @@ function cipher (arr,ee,nn) {
 	}	
 	return arrOut;
 }
-/* 
+/*
 // Its better to use the same algorithme than uncipher()
 function cipher (arr,ee,nn) {
 	var arrOut=[];
