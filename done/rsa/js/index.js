@@ -124,15 +124,15 @@ function GCD (a,b) {
 * @return An array of 16 bits elements
 */
 function stringToArrayBy (str,by) {
+	// To explain
 	var arrOut=[]; var c=0;	
 	for (i=0;i<str.length;i++) {
-		c=c*256+str.substr(i,1).charCodeAt(0) ;
+		c=(c<<8)+str.substr(i,1).charCodeAt(0); // (c*256)
 		if (i%by==(by-1)) {
-			arrOut.push(c);	
-			c=0;
+			arrOut.push(c);	c=0;
 		}		
 	}
-	if (c!=0) arrOut.push(c); 
+	if (c!=0) arrOut.push(c);	
 	return arrOut;	
 }
 /**
@@ -240,14 +240,15 @@ function powMod (ic,ed,nn) {
 * @return Original text reconstituted
 */
 function arrayByToString (arr,by) {
+	// To Explain
 	var str=""; var strBy=""; var c;
 	for (var i=0;i<arr.length;i++) {
 		var nBy=arr[i];	
-		for (var j=0;j<by;j++) {
-			c=nBy%256;
-			 if (c!=0) {
-				strBy=String.fromCharCode(c)+strBy;
-				nBy=Math.floor(nBy/256);
+		for (var j=0;j<by;j++) {				
+			c=nBy & parseInt("11111111",2); 		// extract current right byte value // c=nBy&255 ; // c=nBy%256; /* c=nBy & parseInt("11111111",2); //because 11111111 binary == 255 */
+			if (c!=0) {  
+				strBy=String.fromCharCode(c)+strBy; // put char at the left of tmp string													
+				nBy=nBy>>8; 						// suppress right byte // nBy=Math.floor(nBy/256); 
 			 }
 		}
 		str+=strBy;strBy="";
