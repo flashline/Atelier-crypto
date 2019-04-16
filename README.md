@@ -31,6 +31,9 @@ Si vous n'avez pas d'éditeur de texte installez :
 [Algo RSA](http://culturemath.ens.fr/maths/pdf/nombres/RSA.pdf)  
 [Convertisseur décimal, hexa, binaire](http://sebastienguillon.com/test/javascript/convertisseur.html)  
 [Liste des nombres premiers](http://compoasso.free.fr/primelistweb/page/prime/liste_online.php)
+[Vidéo sur RSA](https://www.youtube.com/watch?v=M7vOxKVLsVY) 
+[Théorème d'Euclide étendu](http://www.bibmath.net/crypto/index.php?action=affiche&quoi=complements/algoeuclid)	
+	
 	
 [Simulation transfert quantic](http://www.pixaline.net/intra/Atelier-2019/crypto/done/quantic/)
 
