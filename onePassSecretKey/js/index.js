@@ -76,9 +76,11 @@ function random () {
 */
 function stringToArrayBy (str,by) {
 	// To explain
-	var arrOut=[]; var c=0;	
+	var arrOut=[]; var c=0;	var nc;
 	for (i=0;i<str.length;i++) {
-		c=(c<<8)+str.substr(i,1).charCodeAt(0); // (c*256)
+		nc=str.substr(i,1).charCodeAt(0);
+		if (nc>255) error("It's not allowed to use unicode 16 bits char. !");
+		c=(c<<8)+nc; // (c*256)
 		if (i%by==(by-1)) {
 			arrOut.push(c);	c=0;
 		}		
@@ -112,14 +114,20 @@ function uncipher (cipherArr,keyArr) {
 */
 function arrayByToString (arr,by) {
 	// To Explain
+	// To Explain
 	var str=""; var strBy=""; var c;
 	for (var i=0;i<arr.length;i++) {
 		var nBy=arr[i];	
 		for (var j=0;j<by;j++) {				
-			 c=nBy & parseInt("11111111",2); 		// extract current right byte value // c=nBy&255 ; // c=nBy%256; /* c=nBy & parseInt("11111111",2); //because 11111111 binary == 255 */
-			if (c!=0) {  
-				strBy=String.fromCharCode(c)+strBy; // put char at the left of tmp string													
-				nBy=nBy>>8; 						// suppress right byte // nBy=Math.floor(nBy/256); 
+			 c=nBy & parseInt("11111111",2); 			// extract current right byte value 
+														// or c=nBy&255 ; 
+														// or c=nBy%256; 
+														// or c=nBy & parseInt("11111111",2); 
+														//    because 11111111 binary == 255 
+			if (c!=0) {  								// If it's not the last octets	
+				strBy=String.fromCharCode(c)+strBy; 	//    put char at the left of tmp string
+				nBy=nBy>>8; 							//    suppress right byte
+														//    or nBy=Math.floor(nBy/256); 
 			 }
 		}
 		str+=strBy;strBy="";
