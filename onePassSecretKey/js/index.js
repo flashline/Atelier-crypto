@@ -2,7 +2,8 @@
 //
 log("*** Alice crée son message en clair. ***");
 // text to be ciphered
-var plainTxt="Please Help me !"; // "Toujours avec le principe de substitution, le bon vieux César y a mis sa patte";//"Help me !"; // 9 chars
+var plainTxt="Please Help me !" ; 
+//var plainTxt=toUnicode("Plœase Help me !") ; // œ // &#339; // "Toujours avec le principe de substitution, le bon vieux César y a mis sa patte";//"Help me !"; // 9 chars
 log("Texte clair : <b>"+plainTxt+"</b>");
 log();
 log("*** Création de la clé (de même longueur que le message) par Alice qu'elle enverra à Bob ***");
@@ -79,7 +80,7 @@ function stringToArrayBy (str,by) {
 	var arrOut=[]; var c=0;	var nc;
 	for (i=0;i<str.length;i++) {
 		nc=str.substr(i,1).charCodeAt(0);
-		if (nc>255) error("It's not allowed to use unicode 16 bits char. !");
+		if (nc>255) error("If message  contains unicode 16 bits char. you have to use toUnicode() function ");		
 		c=(c<<8)+nc; // (c*256)
 		if (i%by==(by-1)) {
 			arrOut.push(c);	c=0;
@@ -151,6 +152,10 @@ function $ (id) {
 function breakPoint () {
 	var str="Break point";
 	log(str);
+	throw(str);
+}
+function error (str) {
+	log("Fatal error. "+str);
 	throw(str);
 }
 
