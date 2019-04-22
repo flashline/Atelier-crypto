@@ -144,7 +144,7 @@ function toUnicode(str) {
 		}
 	}
 	return str;
-}
+}  
 //util func
 function log (o="") {
 	$("info").innerHTML+=o+"<br/>";
