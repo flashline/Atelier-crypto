@@ -135,7 +135,16 @@ function arrayByToString (arr,by) {
 	}
 	return str;
 }
-
+function toUnicode(str) {
+	var nc; var utf;
+	for (i=0;i<str.length;i++) {
+		nc=str.substr(i,1).charCodeAt(0);
+		if (nc>255) {
+			str=str.substr(0,i)+"&#"+nc+";"+str.substr(i+1);
+		}
+	}
+	return str;
+}
 //util func
 function log (o="") {
 	$("info").innerHTML+=o+"<br/>";
