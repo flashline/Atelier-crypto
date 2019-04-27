@@ -5,6 +5,7 @@ log("*** Alice crée son message œen clair. ***");
 var plainTxt="Please Bob help me ..!" ; 
 //var plainTxt=toUnicode("Plœase Help me !") ; // œ // &#339; // "Toujours avec le principe de substitution, le bon vieux César y a mis sa patte";//"Help me !"; // 9 chars
 log("Texte clair : <b>"+plainTxt+"</b>");
+log("Longueur du texte : "+plainTxt.length);
 log();
 log("*** Création de la clé (de même longueur que le message) par Alice qu'elle enverra à Bob ***");
 // Number of bytes per bloc
