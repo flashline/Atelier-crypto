@@ -1,11 +1,10 @@
 //main
-//BigNumber.config({ RANGE: 100000000 }); // 10 millions of digits
 BigNumber.config({ POW_PRECISION: 0 }) ; // No limit of significative digits
 var start=Date.now();
 // Init vars and public key creation by Alice
 log("*** Création de la clé publique par Alice ***"); 
 var p,q;
-p=239 ; q=293 ; const by=2 ; 
+ p=356987927 ; q = 356991587 ; by=5 ; 
 // p=239 ; q=293 ; const by=2 ; 
 //
 // p=503; q=563 ; const by=2 ; 
@@ -14,19 +13,20 @@ p=239 ; q=293 ; const by=2 ;
 //
 // p=20063 ; q=25633 ; const by=3 ; 
 //
-// p=35698781 ; q=35702123 ; const by=5 ; // modify dCompute call
+// p=35698781 ; q=35702123 ; const by=5 ; 
 //
+// p=356987927 ; q = 356991587 ; by=5 ; 
 //
-var n = p*q ;
+var n = computeN(p,q);
 var phi= phiOf (p,q) ;
-log("Phi="+phi);
-var e=primeOf(phi,q*11);
+var e=primeOf(phi,788);
 //
 // Alice give public key to Bob.
 log("Alice donne la clé publique à Bob");
 log("=> Clé publique  = ("+e+" , "+n+")");   
 // test if bloc are less than n
 if (Math.pow(256,by)>n) error("Public key's n="+n+" too small !");
+log("phi="+phi);
 log();
 //////////////////////////
 //breakPoint();
@@ -77,23 +77,37 @@ log("Duration="+((Date.now()-start)/1000)+" sec.");
 /**
 * @param pp	First integer
 * @param qq	Second integer
+* @return N part of public key
+*/
+function computeN (pp,qq) {	
+	if (pp*qq<99999999999999) 
+	// TODO
+	return pp*qq;
+	//\TODO
+	else {
+		return new BigNumber(pp.toString()).times(new BigNumber(qq.toString())).toFixed() ;
+	}
+}
+/**
+* @param pp	First integer
+* @param qq	Second integer
 * @return Phi
 */
 function phiOf (pp,qq) {
+	if ((pp-1)*(qq-1)<99999999999999) 
 	// TODO
-	return (pp-1)*(qq-1) ;
+	return (pp-1)*(qq-1);
+	//\TODO
+	else return (new BigNumber(pp.toString()).minus(1).times(new BigNumber(qq.toString()).minus(1))).toFixed();
 }
-
 /**
 * Creation of number e used to cipher
 * @param phii	(p-1) * (q-1) 
-* @param min	Start value for e		
-* @param pp		first prime number
-* @param qq		second prime number
+* @param min	Start value for e	
 * @return the e number
 */
 function primeOf(phii,min=0) {
-	min=Math.abs(min); min+=2;min+=2;
+	min=Math.abs(min); if (min<3) min=3;
 	if (min>=phii) error("Minimum for e : "+min+" is greater than phi : "+phii+" !");
 	// TODO
 	for (var ee=min;ee<phii;ee++) {
@@ -125,14 +139,15 @@ function GCD (a,b) {
 */
 function stringToArrayBy (str,by) {
 	// To explain
-	var arrOut=[]; var c=0;	
-	for (i=0;i<str.length;i++) {
-		c=(c<<8)+str.substr(i,1).charCodeAt(0); // (c*256)
-		if (i%by==(by-1)) {
+	var arrOut=[]; var c=0;	var nc; 
+	for (i=str.length-1;i>-1;i--) {		
+		nc=str.substr(i,1).charCodeAt(0);
+		if (nc>255) error("If message  contains unicode 16 bits char. you have to use toUnicode() function ");
+		c=(c*256)+str.substr(i,1).charCodeAt(0) ;
+		if (i%by==(by-1) || i==0 ) {
 			arrOut.push(c);	c=0;
-		}		
+		};
 	}
-	if (c!=0) arrOut.push(c);	
 	return arrOut;	
 }
 /**
@@ -141,13 +156,16 @@ function stringToArrayBy (str,by) {
 * @param phii	(p-1) * (q-1) 
 * @return the d number
 */
-function dCompute(ee,phii) {	
-	//return extendedEuclide(ee,phii); //ici
+function dCompute(ee,phii) {
+	if (phi<999999) 
 	//TODO
 	return dComputeEasy(ee,phii);
+	else return extendedEuclide(ee,phii); 
+	
+	
 }
 // Best way to find 'd' :
-function extendedEuclide(a,b) {
+/*function extendedEuclide(a,b) {
 	var phii=b;
 	var x=1 ; var xx=0;
 	var y=0; var yy=1;			
@@ -159,6 +177,22 @@ function extendedEuclide(a,b) {
 	}
 	if (x<0) x+=phii;
 	return x;
+}*/
+function extendedEuclide(a,b) {
+	b=new BigNumber(b.toString());
+	a=new BigNumber(a.toString());
+	var phii=b;
+	var x=new BigNumber(1);
+	var xx=new BigNumber(0);
+	var y=new BigNumber(0); var yy=new BigNumber(1);			
+	while (!b.eq(0)) {
+		var q=a.dividedToIntegerBy(b) ; 
+		var o=store(a.mod(b),b); a=o.v2 ; b=o.v1 ;
+		var o=store(x.minus(q.times(xx)),xx); x=o.v2 ; xx=o.v1 ;
+		var o=store(y.minus(q.times(yy)),yy); y=o.v2 ; yy=o.v1 ;
+	}
+	if (x.isNegative()) x=x.plus(phii);
+	return x;
 }
 function store(v1,v2) {
 	return {v1:v1,v2:v2};
@@ -166,8 +200,7 @@ function store(v1,v2) {
 //
 function dComputeEasy(ee,phii) {
 	// TODO
-	var min=3;
-	for (var dd=min;dd<phii;dd++) {
+	for (var dd=ee;dd<phii;dd++) {
 		if ((ee*dd)%phii==1) break;
 	}
 	return dd;
@@ -207,15 +240,16 @@ function uncipher (arr,dd,nn) {
 */
 function powMod (ic,ed,nn) {	
 	// TODO
-	var oc=1;
-	ic=new BigNumber(ic);						// nothing
-	nn=new BigNumber(nn.toString());			// nothing
-	while(ed>0) {
-		if (ed%2!=0) oc=ic.times(oc).mod(nn); 	// if (ed%2!=0) oc = (ic * oc) % nn	 ;
-		ic=ic.times(ic).mod(nn); 				// ic = (ic * ic) % nn ; 
-		ed=Math.floor(ed/2);		
+	var oc=1;	
+	ed=new BigNumber(ed.toString());
+	ic=new BigNumber(ic.toString());
+	nn=new BigNumber(nn.toString());
+	while(ed.gt(0)) { 										// if (ed>0) {
+		if (!(ed.mod(2).eq(0))) oc=ic.times(oc).mod(nn); 	// oc = (ic * oc) % nn	
+		ic=ic.times(ic).mod(nn); 							// ic = ic * ic % nn	
+		ed=ed.dividedToIntegerBy(2) ;						//ed=Math.floor(ed/2);		
 	}
-	return oc.toFixed();						// return oc
+	return oc.toFixed();									// return oc
 }
 /*
 function powMod (ic,ed,nn) {	
@@ -241,17 +275,25 @@ function powMod (ic,ed,nn) {
 */
 function arrayByToString (arr,by) {
 	// To Explain
-	var str=""; var strBy=""; var c;
-	for (var i=0;i<arr.length;i++) {
-		var nBy=arr[i];	
-		for (var j=0;j<by;j++) {				
-			c=nBy & parseInt("11111111",2); 		// extract current right byte value // c=nBy&255 ; // c=nBy%256; /* c=nBy & parseInt("11111111",2); //because 11111111 binary == 255 */
-			if (c!=0) {  
-				strBy=String.fromCharCode(c)+strBy; // put char at the left of tmp string													
-				nBy=nBy>>8; 						// suppress right byte // nBy=Math.floor(nBy/256); 
-			 }
+	var str="";  var c;	
+	for (var i=arr.length-1;i>-1;i--) {
+		var nBy=arr[i];				
+		while (nBy!=0) {			
+			c=nBy & 0b11111111; 						// extract current right byte value // or c=nBy%256;														
+			if (c==0) continue; 						// If it is the first or last writed byte, it can be 0 left filled
+			str+=String.fromCharCode(c); 				// put char at the left of tmp string			
+			nBy=Math.floor(nBy/256);					// suppress right byte	
+		}		
+	}
+	return str;
+}
+function toUnicode(str) {
+	var nc; var utf;
+	for (i=0;i<str.length;i++) {
+		nc=str.substr(i,1).charCodeAt(0);
+		if (nc>255) {
+			str=str.substr(0,i)+"&#"+nc+";"+str.substr(i+1);
 		}
-		str+=strBy;strBy="";
 	}
 	return str;
 }

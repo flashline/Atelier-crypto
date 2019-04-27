@@ -1,8 +1,8 @@
 //main
 //
-log("*** Alice crée son message en clair. ***");
+log("*** Alice crée son message œen clair. ***");
 // text to be ciphered
-var plainTxt="Please Help me !" ; 
+var plainTxt="Please Bob help me ..!" ; 
 //var plainTxt=toUnicode("Plœase Help me !") ; // œ // &#339; // "Toujours avec le principe de substitution, le bon vieux César y a mis sa patte";//"Help me !"; // 9 chars
 log("Texte clair : <b>"+plainTxt+"</b>");
 log();
@@ -25,6 +25,7 @@ log();
 var arrBy= stringToArrayBy(plainTxt,by);
 log("*** Alice regroupe les caractères "+by+" par "+by+" ("+by*8+" bits) dans un tableau");
 logArr(arrBy);
+
 //
 // Convert key to array of 4 bytes elements
 var keyBy=stringToArrayBy(key,by);
@@ -47,6 +48,7 @@ log("*** Bob  reçoit le message et le déchiffre avec la même clé ***");
 uncipherArr=uncipher(cipherArr,keyBy);
 log("Tableau déchiffré (doit être égal au tableau 'avant chiffrement' ci-dessus)  : ");
 logArr(uncipherArr);
+
 // Uncipher array to string
 var unciphText=arrayByToString (uncipherArr,by) ;
 log("Text déchiffré (doit être égal au texte initial d'Alice ci-dessus) : <b>"+unciphText+"</b>");
@@ -62,14 +64,14 @@ log("Text déchiffré (doit être égal au texte initial d'Alice ci-dessus) : <b
 */
 function createKey (len) {
 	//TODO
-	var key="";var binKey8=""; var binKey=""; var k=0;
+	var key="";var binKey8=""; var k=0; var binKey=""; 
 	for (i=0;i<len*8;i++) {		
 		var bit=random();
-		var k=k+bit; 
-		binKey8+= bit.toString() ; // binKey8+=""+bit; // binkey+=String(bit);
+		k=k+bit; 
+		binKey8+= bit.toString() ; // binKey8+=""+bit; // binkey8=binkey8+String(bit);
 		if ( i%8==7) {
 			key+=String.fromCharCode(k);
-			binKey+=binKey8+"."; binKey8="";
+			binKey+=binKey8+"."; binKey8=""; 
 			k=0;
 		}
 		k=k<<1; // k*=2;
@@ -90,17 +92,16 @@ function random () {
 */
 function stringToArrayBy (str,by) {
 	// To explain
-	var arrOut=[]; var c=0;	var nc;
-	for (i=0;i<str.length;i++) {
+	var arrOut=[]; var c=0;	var nc; 
+	for (i=str.length-1;i>-1;i--) {		
 		nc=str.substr(i,1).charCodeAt(0);
-		if (nc>255) error("It's not allowed to use unicode 16 bits char. !");
-		c=(c<<8)+nc; // (c*256)
-		if (i%by==(by-1)) {
+		if (nc>255) error("If message  contains unicode 16 bits char. you have to use toUnicode() function ");
+		c=(c*256)+str.substr(i,1).charCodeAt(0) ;
+		if (i%by==(by-1) || i==0 ) {
 			arrOut.push(c);	c=0;
-		}		
+		};
 	}
-	if (c!=0) arrOut.push(c);	
-	return arrOut;		
+	return arrOut;	
 }
 
 /**
@@ -137,22 +138,15 @@ function uncipher (cipherArr,keyArr) {
 */
 function arrayByToString (arr,by) {
 	// To Explain
-	var str=""; var strBy=""; var c;
-	for (var i=0;i<arr.length;i++) {
-		var nBy=arr[i];	
-		for (var j=0;j<by;j++) {				
-			 c=nBy & parseInt("11111111",2); 			// extract current right byte value 
-														// or c=nBy&255 ; 
-														// or c=nBy%256; 
-														// or c=nBy & parseInt("11111111",2); 
-														//    because 11111111 binary == 255 
-			if (c!=0) {  								// If it's not the last octets	
-				strBy=String.fromCharCode(c)+strBy; 	//    put char at the left of tmp string
-				nBy=nBy>>8; 							//    suppress right byte
-														//    or nBy=Math.floor(nBy/256); 
-			 }
-		}
-		str+=strBy;strBy="";
+	var str="";  var c;	
+	for (var i=arr.length-1;i>-1;i--) {
+		var nBy=arr[i];				
+		while (nBy!=0) {			
+			c=nBy & 0b11111111; 						// extract current right byte value // or c=nBy%256;														
+			if (c==0) continue; 						// If it is the first or last writed byte, it can be 0 left filled
+			str+=String.fromCharCode(c); 				// put char at the left of tmp string			
+			nBy=Math.floor(nBy/256);					// suppress right byte	
+		}		
 	}
 	return str;
 }
@@ -188,5 +182,7 @@ function error (str) {
 	log("Fatal error. "+str);
 	throw(str);
 }
+
+
 
 

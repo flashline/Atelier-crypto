@@ -115,14 +115,15 @@ function GCD (a,b) {
 */
 function stringToArrayBy (str,by) {
 	// To explain
-	var arrOut=[]; var c=0;	
-	for (i=0;i<str.length;i++) {
-		c=(c<<8)+str.substr(i,1).charCodeAt(0); // (c*256)
-		if (i%by==(by-1)) {
+	var arrOut=[]; var c=0;	var nc; 
+	for (i=str.length-1;i>-1;i--) {		
+		nc=str.substr(i,1).charCodeAt(0);
+		if (nc>255) error("If message  contains unicode 16 bits char. you have to use toUnicode() function ");
+		c=(c*256)+str.substr(i,1).charCodeAt(0) ;
+		if (i%by==(by-1) || i==0 ) {
 			arrOut.push(c);	c=0;
-		}		
+		};
 	}
-	if (c!=0) arrOut.push(c);	
 	return arrOut;	
 }
 /**

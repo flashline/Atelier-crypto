@@ -2,7 +2,7 @@
 //
 log("*** Alice crée son message en clair. ***");
 // text to be ciphered
-var plainTxt="Please Help me !" ; 
+var plainTxt="Please Help me ..!" ; 
 //var plainTxt=toUnicode("Plœase Help me !") ; // œ // &#339; // "Toujours avec le principe de substitution, le bon vieux César y a mis sa patte";//"Help me !"; // 9 chars
 log("Texte clair : <b>"+plainTxt+"</b>");
 log();
@@ -77,17 +77,16 @@ function random () {
 */
 function stringToArrayBy (str,by) {
 	// To explain
-	var arrOut=[]; var c=0;	var nc;
-	for (i=0;i<str.length;i++) {
+	var arrOut=[]; var c=0;	var nc; 
+	for (i=str.length-1;i>-1;i--) {		
 		nc=str.substr(i,1).charCodeAt(0);
-		if (nc>255) error("If message  contains unicode 16 bits char. you have to use toUnicode() function ");		
-		c=(c<<8)+nc; // (c*256)
-		if (i%by==(by-1)) {
+		if (nc>255) error("If message  contains unicode 16 bits char. you have to use toUnicode() function ");
+		c=(c*256)+str.substr(i,1).charCodeAt(0) ;
+		if (i%by==(by-1) || i==0 ) {
 			arrOut.push(c);	c=0;
-		}		
+		};
 	}
-	if (c!=0) arrOut.push(c);	
-	return arrOut;	
+	return arrOut;
 }
 /**
 * Ciphering 
@@ -115,23 +114,15 @@ function uncipher (cipherArr,keyArr) {
 */
 function arrayByToString (arr,by) {
 	// To Explain
-	// To Explain
-	var str=""; var strBy=""; var c;
-	for (var i=0;i<arr.length;i++) {
-		var nBy=arr[i];	
-		for (var j=0;j<by;j++) {				
-			 c=nBy & parseInt("11111111",2); 			// extract current right byte value 
-														// or c=nBy&255 ; 
-														// or c=nBy%256; 
-														// or c=nBy & parseInt("11111111",2); 
-														//    because 11111111 binary == 255 
-			if (c!=0) {  								// If it's not the last octets	
-				strBy=String.fromCharCode(c)+strBy; 	//    put char at the left of tmp string
-				nBy=nBy>>8; 							//    suppress right byte
-														//    or nBy=Math.floor(nBy/256); 
-			 }
-		}
-		str+=strBy;strBy="";
+	var str="";  var c;	
+	for (var i=arr.length-1;i>-1;i--) {
+		var nBy=arr[i];				
+		while (nBy!=0) {			
+			c=nBy & 0b11111111; 						// extract current right byte value // or c=nBy%256;														
+			if (c==0) continue; 						// If it is the first or last writed byte, it can be 0 left filled
+			str+=String.fromCharCode(c); 				// put char at the left of tmp string			
+			nBy=Math.floor(nBy/256);					// suppress right byte	
+		}		
 	}
 	return str;
 }
