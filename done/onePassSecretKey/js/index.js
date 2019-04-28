@@ -2,10 +2,11 @@
 //
 log("*** Alice crée son message œen clair. ***");
 // text to be ciphered
-var plainTxt="Please Bob help me ..!" ; 
+var plainTxt="Please Bob Help me !..." ; 
 //var plainTxt=toUnicode("Plœase Help me !") ; // œ // &#339; // "Toujours avec le principe de substitution, le bon vieux César y a mis sa patte";//"Help me !"; // 9 chars
 log("Texte clair : <b>"+plainTxt+"</b>");
 log("Longueur du texte : "+plainTxt.length);
+
 log();
 log("*** Création de la clé (de même longueur que le message) par Alice qu'elle enverra à Bob ***");
 // Number of bytes per bloc
@@ -93,18 +94,17 @@ function random () {
 */
 function stringToArrayBy (str,by) {
 	// To explain
-	var arrOut=[]; var c=0;	var nc; 
-	for (i=str.length-1;i>-1;i--) {		
-		nc=str.substr(i,1).charCodeAt(0);
-		if (nc>255) error("If message  contains unicode 16 bits char. you have to use toUnicode() function ");
-		c=(c*256)+nc ;
-		if (i%by==0 || i==0 ) {
-			arrOut.push(c);	c=0;
-		};
+	var arrOut=[]; var nc=0;var c;
+	for (i=0;i<str.length;i++) {
+		c=str.charCodeAt(i);
+		if (c>255) error("If message  contains unicode 16 bits char, you have to use toUnicode() ");
+		nc=nc*256+c ;
+		if (i%by==(by-1) || i==str.length-1) {
+			arrOut.push(nc);	nc=0;
+		}		
 	}
-	return arrOut;	
+	return arrOut;
 }
-
 /**
 * Ciphering 
 * @param  msgArr 			Message's 32 bits elements array
@@ -139,15 +139,15 @@ function uncipher (cipherArr,keyArr) {
 */
 function arrayByToString (arr,by) {
 	// To Explain
-	var str="";  var c;	
-	for (var i=arr.length-1;i>-1;i--) {
-		var nBy=arr[i];				
-		while (nBy!=0) {			
-			c=nBy & 0b11111111; 						// extract current right byte value // or c=nBy%256;														
-			if (c==0) continue; 						// If it is the first or last writed byte, it can be 0 left filled
-			str+=String.fromCharCode(c); 				// put char at the left of tmp string			
-			nBy=Math.floor(nBy/256);					// suppress right byte	
-		}		
+	var str=""; var strBy=""; var c;
+	for (var i=0;i<arr.length;i++) {
+		var nc=arr[i];	
+		while (nc!=0) {
+			c=nc%256; 										// or c=nBy & 0b11111111; // extract current right byte value
+			strBy=String.fromCharCode(c)+strBy; 			// put char at the left of tmp string 
+			nc=Math.floor(nc/256);							// suppress right byte			 
+		}
+		str+=strBy;strBy="";
 	}
 	return str;
 }
