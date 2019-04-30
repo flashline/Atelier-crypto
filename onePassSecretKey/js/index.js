@@ -79,14 +79,14 @@ function random () {
 */
 function stringToArrayBy (str,by) {
 	// To explain
-	var arrOut=[]; var c=0;	var nc; 
-	for (i=str.length-1;i>-1;i--) {		
-		nc=str.charCodeAt(i);
-		if (nc>255) error("If message  contains unicode 16 bits char. you have to use toUnicode() function ");
-		c=(c*256)+nc ;
-		if (i%by==0 || i==0 ) {
-			arrOut.push(c);	c=0;
-		};
+	var arrOut=[]; var nc=0;var c;
+	for (i=0;i<str.length;i++) {
+		c=str.charCodeAt(i);
+		if (c>255) error("If message  contains unicode 16 bits char, you have to use toUnicode() ");
+		nc=nc*256+c ;							// or nc=nc*0b100000000+c ; //
+		if (i%by==(by-1) || i==str.length-1) {
+			arrOut.push(nc);	nc=0;
+		}		
 	}
 	return arrOut;
 }
@@ -120,9 +120,9 @@ function arrayByToString (arr,by) {
 	for (var i=0;i<arr.length;i++) {
 		var nc=arr[i];	
 		while (nc!=0) {
-			c=nc%256; 										// or c=nBy & 0b11111111; // extract current right byte value
-			strBy=String.fromCharCode(c)+strBy; 			// put char at the left of tmp string 
-			nc=Math.floor(nc/256);							// suppress right byte			 
+			c=nc%256; 							// or c=nc%0b100000000; // extract current right byte value
+			strBy=String.fromCharCode(c)+strBy; // put char at the left of tmp string 
+			nc=Math.floor(nc/256);				// or nc=Math.floor(nc/0b100000000); // suppress right byte			 
 		}
 		str+=strBy;strBy="";
 	}

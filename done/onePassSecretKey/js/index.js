@@ -1,6 +1,6 @@
 //main
 //
-log("*** Alice crée son message œen clair. ***");
+log("*** Alice crée son message en clair. ***");
 // text to be ciphered
 var plainTxt="Please Bob Help me !..." ; 
 //var plainTxt=toUnicode("Plœase Help me !") ; // œ // &#339; // "Toujours avec le principe de substitution, le bon vieux César y a mis sa patte";//"Help me !"; // 9 chars
@@ -34,6 +34,7 @@ var keyBy=stringToArrayBy(key,by);
 log("Les caractères de la clé sont aussi regroupés par "+by);
 logArr(keyBy);
 //
+// breakPoint();
 // Ciphering
 var cipherArr=cipher (arrBy,keyBy);
 log("Le tableau est chiffré : ");
@@ -68,10 +69,10 @@ function createKey (len) {
 	//TODO
 	var key="";var binKey8=""; var k=0; var binKey=""; 
 	for (i=0;i<len*8;i++) {		
-		var bit=random();
-		k=k+bit; 
+		var bit=random();		
+		k+=bit;
 		binKey8+= bit.toString() ; // binKey8+=""+bit; // binkey8=binkey8+String(bit);
-		if ( i%8==7) {
+		if ( i%8==7) {			
 			key+=String.fromCharCode(k);
 			binKey+=binKey8+"."; binKey8=""; 
 			k=0;
@@ -98,7 +99,7 @@ function stringToArrayBy (str,by) {
 	for (i=0;i<str.length;i++) {
 		c=str.charCodeAt(i);
 		if (c>255) error("If message  contains unicode 16 bits char, you have to use toUnicode() ");
-		nc=nc*256+c ;
+		nc=nc*256+c ;							// or nc=nc*0b100000000+c ; //
 		if (i%by==(by-1) || i==str.length-1) {
 			arrOut.push(nc);	nc=0;
 		}		
@@ -137,15 +138,16 @@ function uncipher (cipherArr,keyArr) {
 * @param  by		Number of  bytes (by=4) 					
 * @return Original text reconstituted
 */
+
 function arrayByToString (arr,by) {
 	// To Explain
 	var str=""; var strBy=""; var c;
 	for (var i=0;i<arr.length;i++) {
 		var nc=arr[i];	
 		while (nc!=0) {
-			c=nc%256; 										// or c=nBy & 0b11111111; // extract current right byte value
-			strBy=String.fromCharCode(c)+strBy; 			// put char at the left of tmp string 
-			nc=Math.floor(nc/256);							// suppress right byte			 
+			c=nc%256; 							// or c=nc%0b100000000; // extract current right byte value
+			strBy=String.fromCharCode(c)+strBy; // put char at the left of tmp string 
+			nc=Math.floor(nc/256);				// or nc=Math.floor(nc/0b100000000); // suppress right byte			 
 		}
 		str+=strBy;strBy="";
 	}
