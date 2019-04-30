@@ -32,6 +32,7 @@ var keyBy=stringToArrayBy(key,by);
 log("Les caractères de la clé sont aussi regroupés par "+by);
 logArr(keyBy);
 //
+breakPoint();
 // Ciphering
 var cipherArr=cipher (arrBy,keyBy);
 log("Le tableau est chiffré : ");
