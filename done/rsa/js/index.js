@@ -1,11 +1,18 @@
 //main
 BigNumber.config({ POW_PRECISION: 0 }) ; // No limit of significative digits
 var start=Date.now();
+const MAX_POW=9999;
+const START_E=788;
 // Init vars and public key creation by Alice
 log("*** Création de la clé publique par Alice ***"); 
 var p,q;
- p=356987927 ; q = 356991587 ; by=5 ; 
-// p=239 ; q=293 ; const by=2 ; 
+p=989456129273 ; q=989456129339 ; by=5 ;  
+//
+// p=107 ; q=113 ; const by=1 ;
+//
+// p=67 ; q=71 ; const by=1 ;
+//
+// p=239 ; q=293 ; const by=2 ;
 //
 // p=503; q=563 ; const by=2 ; 
 //
@@ -17,16 +24,27 @@ var p,q;
 //
 // p=356987927 ; q = 356991587 ; by=5 ; 
 //
+// p=789456129313 ; q = 789456123943 ; by=5 ;      
+//
+// p=989456129273	 ; q = 989456129297 ; by=5 ;  
+//   
+// p=989456129273 ; q=989456129339 ; by=5 ;  
+//
+// p=895412375647 ; q=895412380189 ; by=5; // bug 
 var n = computeN(p,q);
 var phi= phiOf (p,q) ;
-var e=primeOf(phi,788);
+var e=primeOf(phi,START_E);
 //
+log("p="+p);
+log("q="+q);
+log("phi="+phi);
+log();
 // Alice give public key to Bob.
 log("Alice donne la clé publique à Bob");
 log("=> Clé publique  = ("+e+" , "+n+")");   
 // test if bloc are less than n
 if (Math.pow(256,by)>n) error("Public key's n="+n+" too small !");
-log("phi="+phi);
+
 log();
 //////////////////////////
 //breakPoint();
@@ -41,8 +59,9 @@ log();
 //////////////////////////
 log("*** Bob crée, chiffre et envoie son message to Alice ***"); 
 // create plain text
-var plainTxt="Help me. I'm lost!";
+var plainTxt="Help Alice I'm lost!";
 log("Message en clair : <b>"+plainTxt+"</b>");
+log("Longueur du texte : "+plainTxt.length);
 //
 // Store and group plain text in array
 var arrBy= stringToArrayBy(plainTxt,by);
@@ -80,11 +99,15 @@ log("Duration="+((Date.now()-start)/1000)+" sec.");
 * @return N part of public key
 */
 function computeN (pp,qq) {	
-	if (pp*qq<99999999999999) 
-	// TODO
-	return pp*qq;
+	if (pp*qq<1000000000000000) // <=1 000 000 000 000 000 soit pas plus de 15 chiffres 
+	{		
+		// TODO
+		//log("15 chiffres ou moins");
+		return pp*qq;
+	}
 	//\TODO
 	else {
+		//log("plus de 15 chiffres");
 		return new BigNumber(pp.toString()).times(new BigNumber(qq.toString())).toFixed() ;
 	}
 }
@@ -107,11 +130,13 @@ function phiOf (pp,qq) {
 * @return the e number
 */
 function primeOf(phii,min=0) {
-	min=Math.abs(min); if (min<3) min=3;
+	min=Math.abs(min); if (min<3) min=3; var gcdPhi;
 	if (min>=phii) error("Minimum for e : "+min+" is greater than phi : "+phii+" !");
 	// TODO
 	for (var ee=min;ee<phii;ee++) {
-		if (GCD(phii,ee)==1) break;
+		if (phi<999999) gcdPhi=easyGCD(phii,ee) ;
+		else gcdPhi=GCD(phii,ee) ;
+		if (gcdPhi==1) break;
 	}
 	return ee;
 }
@@ -121,6 +146,21 @@ function primeOf(phii,min=0) {
 * @param b	Second integer
 * @return the GCD
 */
+function easyGCD (a,b) {
+	// TODO
+    while (a != b) {
+        if (a > b) {
+			//log("a>b : a="+a+"-"+b+" ="+(a-b));
+			a = a - b ;
+		}
+        else {
+			//log("a<=b : b="+b+"-"+a+" ="+(b-a));
+			b = b - a ;
+		}
+	}	
+	//log("a="+a+" b="+b);
+    return a;
+}
 function GCD (a,b) {
 	// TODO	
 	var r=a%b;	
@@ -138,15 +178,15 @@ function GCD (a,b) {
 * @return An array of 16 bits elements
 */
 function stringToArrayBy (str,by) {
-	// To explain
-	var arrOut=[]; var c=0;	var nc; 
-	for (i=str.length-1;i>-1;i--) {		
-		nc=str.substr(i,1).charCodeAt(0);
-		if (nc>255) error("If message  contains unicode 16 bits char. you have to use toUnicode() function ");
-		c=(c*256)+nc ;
-		if (i%by==0 || i==0 ) {
-			arrOut.push(c);	c=0;
-		};
+// To explain
+	var arrOut=[]; var nc=0;var c;
+	for (i=0;i<str.length;i++) {
+		c=str.charCodeAt(i);
+		if (c>255) error("If message  contains unicode 16 bits char, you have to use toUnicode() ");
+		nc=nc*256+c ;							// or nc=nc*0b100000000+c ; //
+		if (i%by==(by-1) || i==str.length-1) {
+			arrOut.push(nc);	nc=0;
+		}		
 	}
 	return arrOut;	
 }
@@ -165,19 +205,6 @@ function dCompute(ee,phii) {
 	
 }
 // Best way to find 'd' :
-/*function extendedEuclide(a,b) {
-	var phii=b;
-	var x=1 ; var xx=0;
-	var y=0; var yy=1;			
-	while (b!=0) {
-		var q=Math.floor(a/b);
-		var o=store(a%b,b); a=o.v2 ; b=o.v1 ;
-		var o=store(x-q*xx,xx); x=o.v2 ; xx=o.v1 ;
-		var o=store(y-q*yy,yy); y=o.v2 ; yy=o.v1 ;			
-	}
-	if (x<0) x+=phii;
-	return x;
-}*/
 function extendedEuclide(a,b) {
 	b=new BigNumber(b.toString());
 	a=new BigNumber(a.toString());
@@ -192,7 +219,7 @@ function extendedEuclide(a,b) {
 		var o=store(y.minus(q.times(yy)),yy); y=o.v2 ; yy=o.v1 ;
 	}
 	if (x.isNegative()) x=x.plus(phii);
-	return x;
+	return x.toFixed();
 }
 function store(v1,v2) {
 	return {v1:v1,v2:v2};
@@ -214,9 +241,13 @@ function dComputeEasy(ee,phii) {
 */
 function cipher (arr,ee,nn) {
 	//TODO
-	var arrOut=[];
-	for (var i in arr) {			
-		arrOut.push(powMod(arr[i],ee,nn));	// arrOut.push(Math.pow(arr[i],ee) % nn) ;	
+	var arrOut=[];	
+	for (var i in arr) {
+		if (ee<MAX_POW) {
+			arrOut.push (new BigNumber(arr[i]).pow(ee).mod(nn)) ;
+			//log("pow "+ee+" ="+new BigNumber(arr[i]).pow(ee).toFixed());
+		}		
+		else arrOut.push(powMod(arr[i],ee,nn));	
 	}	
 	return arrOut;
 }
@@ -244,29 +275,13 @@ function powMod (ic,ed,nn) {
 	ed=new BigNumber(ed.toString());
 	ic=new BigNumber(ic.toString());
 	nn=new BigNumber(nn.toString());
-	while(ed.gt(0)) { 										// if (ed>0) {
-		if (!(ed.mod(2).eq(0))) oc=ic.times(oc).mod(nn); 	// oc = (ic * oc) % nn	
-		ic=ic.times(ic).mod(nn); 							// ic = ic * ic % nn	
-		ed=ed.dividedToIntegerBy(2) ;						//ed=Math.floor(ed/2);		
-	}
-	return oc.toFixed();									// return oc
-}
-/*
-function powMod (ic,ed,nn) {	
-	// TODO
-	var oc;	
-	oc=1;
-	ic=new BigNumber(ic.toString());
-	ed=new BigNumber(ed.toString());
-	nn=new BigNumber(nn.toString());
 	while(ed.gt(0)) { 										// while(ed>0) {
 		if (!(ed.mod(2).eq(0))) oc=ic.times(oc).mod(nn); 	// if (ed%2==0) oc = (ic * oc) % nn	
 		ic=ic.times(ic).mod(nn); 							// ic = ic * ic % nn	
 		ed=ed.dividedToIntegerBy(2) ;						// ed=Math.floor(ed/2);		
 	}
-	return oc.toFixed();
+	return oc.toFixed();									// return oc
 }
-*/
 /**
 * Reconstruction of plain text
 * @param  arr 		Unciphered array
@@ -275,17 +290,17 @@ function powMod (ic,ed,nn) {
 */
 function arrayByToString (arr,by) {
 	// To Explain
-	var str="";  var c;	
-	for (var i=arr.length-1;i>-1;i--) {
-		var nBy=arr[i];				
-		while (nBy!=0) {			
-			c=nBy & 0b11111111; 						// extract current right byte value // or c=nBy%256;														
-			if (c==0) continue; 						// If it is the first or last writed byte, it can be 0 left filled
-			str+=String.fromCharCode(c); 				// put char at the left of tmp string			
-			nBy=Math.floor(nBy/256);					// suppress right byte	
-		}		
+	var str=""; var strBy=""; var c;
+	for (var i=0;i<arr.length;i++) {
+		var nc=arr[i];	
+		while (nc!=0) {
+			c=nc%256; 							// or c=nc%0b100000000; // mettre le car. à gauche de la string tempo // extract current right byte value
+			strBy=String.fromCharCode(c)+strBy; // mettre le car. à gauche de la string tempo// put char at the left of tmp string 
+			nc=Math.floor(nc/256);				// ou nc=Math.floor(nc/0b100000000); // suppression de l'octet de droite. // suppress right byte			 
+		}
+		str+=strBy;strBy="";					// On range la string tempo de 4 car. dans la string finale.
 	}
-	return str;
+	return str;									// retour du message en clair.	
 }
 function toUnicode(str) {
 	var nc; var utf;
