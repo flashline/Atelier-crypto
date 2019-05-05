@@ -1,16 +1,17 @@
 //main
+//easyGCD(29,21); breakPoint();
 BigNumber.config({ POW_PRECISION: 0 }) ; // No limit of significative digits
 var start=Date.now();
 const MAX_POW=9999;
-const START_E=788;
+const START_E= 788 ; // 788; // 3 ; // 998456129339 //
 // Init vars and public key creation by Alice
 log("*** Création de la clé publique par Alice ***"); 
 var p,q;
-p=989456129273 ; q=989456129339 ; by=5 ;  
-//
-// p=107 ; q=113 ; const by=1 ;
+p=989456129273 ; q=989456129339 ; by=6 ; 
 //
 // p=67 ; q=71 ; const by=1 ;
+//
+// p=107 ; q=113 ; const by=1 ;
 //
 // p=239 ; q=293 ; const by=2 ;
 //
@@ -28,9 +29,9 @@ p=989456129273 ; q=989456129339 ; by=5 ;
 //
 // p=989456129273	 ; q = 989456129297 ; by=5 ;  
 //   
-// p=989456129273 ; q=989456129339 ; by=5 ;  
+// p=989456129273 ; q=989456129339 ; by=6 ;  
 //
-// p=895412375647 ; q=895412380189 ; by=5; // bug 
+// p=895412375647 ; q=895412380189 ; by=6; // bug 
 var n = computeN(p,q);
 var phi= phiOf (p,q) ;
 var e=primeOf(phi,START_E);
@@ -41,7 +42,7 @@ log("phi="+phi);
 log();
 // Alice give public key to Bob.
 log("Alice donne la clé publique à Bob");
-log("=> Clé publique  = ("+e+" , "+n+")");   
+log("=> Clé publique (e,n) = ("+e+" , "+n+")");   
 // test if bloc are less than n
 if (Math.pow(256,by)>n) error("Public key's n="+n+" too small !");
 
@@ -59,7 +60,8 @@ log();
 //////////////////////////
 log("*** Bob crée, chiffre et envoie son message to Alice ***"); 
 // create plain text
-var plainTxt="Help Alice I'm lost!";
+var plainTxt="Help me, Alice I'm lost!";
+//var plainTxt=toUnicode("Help me, Plœase  Alice I'm lost!")
 log("Message en clair : <b>"+plainTxt+"</b>");
 log("Longueur du texte : "+plainTxt.length);
 //
@@ -98,15 +100,13 @@ log("Duration="+((Date.now()-start)/1000)+" sec.");
 * @param qq	Second integer
 * @return N part of public key
 */
-function computeN (pp,qq) {	
-	if (pp*qq<1000000000000000) // <=1 000 000 000 000 000 soit pas plus de 15 chiffres 
-	{		
-		// TODO
+function computeN (pp,qq) {
+	// TODO
+	if (pp*qq<1000000000000000) // <=1 000 000 000 000 000 soit pas plus de 15 chiffres
+	{				
 		//log("15 chiffres ou moins");
 		return pp*qq;
-	}
-	//\TODO
-	else {
+	} else {
 		//log("plus de 15 chiffres");
 		return new BigNumber(pp.toString()).times(new BigNumber(qq.toString())).toFixed() ;
 	}
@@ -117,10 +117,8 @@ function computeN (pp,qq) {
 * @return Phi
 */
 function phiOf (pp,qq) {
-	if ((pp-1)*(qq-1)<99999999999999) 
 	// TODO
-	return (pp-1)*(qq-1);
-	//\TODO
+	if ((pp-1)*(qq-1)<99999999999999) return (pp-1)*(qq-1);		
 	else return (new BigNumber(pp.toString()).minus(1).times(new BigNumber(qq.toString()).minus(1))).toFixed();
 }
 /**
@@ -131,12 +129,11 @@ function phiOf (pp,qq) {
 */
 function primeOf(phii,min=0) {
 	min=Math.abs(min); if (min<3) min=3; var gcdPhi;
-	if (min>=phii) error("Minimum for e : "+min+" is greater than phi : "+phii+" !");
+	if (min>=phii) error("Minimum for e : "+min+" is greater than phi : "+phii+" !"); 
 	// TODO
+	if (phi<999999) gcdPhi=easyGCD ; else gcdPhi=GCD ;
 	for (var ee=min;ee<phii;ee++) {
-		if (phi<999999) gcdPhi=easyGCD(phii,ee) ;
-		else gcdPhi=GCD(phii,ee) ;
-		if (gcdPhi==1) break;
+		if (gcdPhi(phii,ee)==1) break;
 	}
 	return ee;
 }
@@ -150,15 +147,16 @@ function easyGCD (a,b) {
 	// TODO
     while (a != b) {
         if (a > b) {
-			//log("a>b : a="+a+"-"+b+" ="+(a-b));
-			a = a - b ;
+			a-=b ; // log("a>b => a=a-b : "+a+"-"+b+" ="+(a-=b)); 
+			//a = a - b ; // a-=b ; //
 		}
         else {
-			//log("a<=b : b="+b+"-"+a+" ="+(b-a));
-			b = b - a ;
+			b-=a ; // log("a<=b => b=b-a: "+b+"-"+a+" ="+(b-=a)); 
+			// b=b-a; // b-=a ; //
+			
 		}
 	}	
-	//log("a="+a+" b="+b);
+	//log("a=b=pgcd="+a);
     return a;
 }
 function GCD (a,b) {
@@ -197,8 +195,8 @@ function stringToArrayBy (str,by) {
 * @return the d number
 */
 function dCompute(ee,phii) {
-	if (phi<999999) 
 	//TODO
+	if (phi<999999)	
 	return dComputeEasy(ee,phii);
 	else return extendedEuclide(ee,phii); 
 	
@@ -244,7 +242,7 @@ function cipher (arr,ee,nn) {
 	var arrOut=[];	
 	for (var i in arr) {
 		if (ee<MAX_POW) {
-			arrOut.push (new BigNumber(arr[i]).pow(ee).mod(nn)) ;
+			arrOut.push (new BigNumber(arr[i].toString()).pow(ee).mod(nn).toFixed()) ; // arrOut.push (Math.pow(arr[i],ee)%nn ) ;
 			//log("pow "+ee+" ="+new BigNumber(arr[i]).pow(ee).toFixed());
 		}		
 		else arrOut.push(powMod(arr[i],ee,nn));	
