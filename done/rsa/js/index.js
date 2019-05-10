@@ -1,13 +1,15 @@
 //main
 //easyGCD(29,21); breakPoint();
 BigNumber.config({ POW_PRECISION: 0 }) ; // No limit of significative digits
-var start=Date.now();
+//
+//
+// vars declaration
 const MAX_POW=9999;
 const START_E= 788 ; // 788; // 3 ; // 998456129339 //
-// Init vars and public key creation by Alice
-log("*** Création de la clé publique par Alice ***"); 
+//
+var n,phi,e,d,plainTxt,arrBy,cipherArr;
 var p,q;
-p=989456129273 ; q=989456129339 ; by=6 ; 
+p=989456129273 ; q=989456129339 ; by=6 ;  
 //
 // p=67 ; q=71 ; const by=1 ;
 //
@@ -32,9 +34,20 @@ p=989456129273 ; q=989456129339 ; by=6 ;
 // p=989456129273 ; q=989456129339 ; by=6 ;  
 //
 // p=895412375647 ; q=895412380189 ; by=6; // bug 
-var n = computeN(p,q);
-var phi= phiOf (p,q) ;
-var e=primeOf(phi,START_E);
+//
+//
+$("alicePrivate").addEventListener("click",alicePrivate);
+$("bobSend").addEventListener("click",bobSend);
+$("aliceReceive").addEventListener("click",aliceReceive);
+$("bobSend").disabled = true;
+$("aliceReceive").disabled = true;
+//
+//
+// Public key creation by Alice
+log("*** Création de la clé publique par Alice ***"); 
+n = computeN(p,q);
+phi= phiOf (p,q) ;
+e=primeOf(phi,START_E);
 //
 log("p="+p);
 log("q="+q);
@@ -45,64 +58,66 @@ log("Alice donne la clé publique à Bob");
 log("=> Clé publique (e,n) = ("+e+" , "+n+")");   
 // test if bloc are less than n
 if (Math.pow(256,by)>n) error("Public key's n="+n+" too small !");
-
-log();
-//////////////////////////
-//breakPoint();
-//////////////////////////
-log("*** Alice calcul l'élément d de sa clé secrète  ***"); 
-// compute d (private key with n)
-var d=dCompute(e,phi);
-log("d est égal à "+d);
-log();
-//////////////////////////
-//breakPoint();
-//////////////////////////
-log("*** Bob crée, chiffre et envoie son message to Alice ***"); 
-// create plain text
-var plainTxt="Help me, Alice I'm lost!";
-//var plainTxt=toUnicode("Help me, Plœase  Alice I'm lost!")
-log("Message en clair : <b>"+plainTxt+"</b>");
-log("Longueur du texte : "+plainTxt.length);
 //
-// Store and group plain text in array
-var arrBy= stringToArrayBy(plainTxt,by);
-log("Tableau des caractères groupés "+by+" par "+by+" ("+(by*8)+" bits)");
-logArr(arrBy);
 //
-// ciphering
-var cipherArr=cipher (arrBy,e,n);
-log("Tableau chiffré par Bob : ");
-logArr(cipherArr);
-//
+// Listener functions
+function alicePrivate (evt) {
+	evt.target.disabled = true;
+	$("bobSend").disabled = false;
+	log();
+	log("*** Alice calcul l'élément <b>d</b> de sa clé secrète  ***"); 
+	// compute d (private key with n)
+	d=dCompute(e,phi);
+	//log("d est égal à "+d);
+	log("=> Clé privée (d,n) = ("+d+" , "+n+")");  	
+}
 //////////////////////////
-//breakPoint();
+function bobSend(evt) {
+	evt.target.disabled = true;
+	$("aliceReceive").disabled = false;
+	log();
+	log("*** Bob crée, chiffre et envoie son message à Alice ***"); 
+	// create plain text
+	plainTxt="Help me Alice. I'm lost!"; // plainTxt="HelpMe Alix HelpMe"; // 
+	//var plainTxt=toUnicode("Help me, Plœase  Alice I'm lost!")
+	log("Message en clair : <b>"+plainTxt+"</b>");
+	log("Longueur du texte : "+plainTxt.length);
+	//
+	// Store and group plain text in array
+	arrBy= stringToArrayBy(plainTxt,by);
+	log("Tableau des caractères groupés "+by+" par "+by+" ("+(by*8)+" bits)");
+	logArr(arrBy);
+	//
+	// ciphering
+	cipherArr=cipher (arrBy,e,n);
+	log("Tableau chiffré par Bob : ");
+	logArr(cipherArr);
+}
 //////////////////////////
-log();
-log("*** Alice reçoit et déchiffre le message  ***"); 
-// unciphering
-var uncipherArr=uncipher(cipherArr,d,n) ;
-log("Tableau déchiffré (doit être égal à 'Tableau des caractères groupés "+by+" par "+by+" ci-dessus) ");
-logArr(uncipherArr);
-//
-// Convert unciphered text to plain text
-var unciphText=arrayByToString(uncipherArr,by);
-log("Message déchiffré (doit être égal 'Message en clair' ci-dessus)  : <b>"+unciphText+"</b>");
-//
-/**/
-log("Duration="+((Date.now()-start)/1000)+" sec.");
-
+function aliceReceive (evt) {
+	evt.target.disabled = true;
+	log();
+	log("*** Alice reçoit et déchiffre le message puis enfourche son destrier pour sauver Bob ! ***"); 
+	// unciphering
+	uncipherArr=uncipher(cipherArr,d,n) ;
+	log("Tableau déchiffré (doit être égal à ''Tableau des caractères groupés "+by+" par "+by+"'' ci-dessus) ");
+	logArr(uncipherArr);
+	//
+	// Convert unciphered text to plain text
+	var unciphText=arrayByToString(uncipherArr,by);
+	log("Message dégroupé (doit être égal ''Message en clair'' ci-dessus)  : <b>"+unciphText+"</b>");
+}
 //
 //
 //functions
 /**
 * @param pp	First integer
 * @param qq	Second integer
-* @return N part of public key
+* @return N part of public key (p*q)
 */
 function computeN (pp,qq) {
 	// TODO
-	if (pp*qq<1000000000000000) // <=1 000 000 000 000 000 soit pas plus de 15 chiffres
+	if (pp*qq<1000000000000000) // <1 000 000 000 000 000 soit pas plus de 15 chiffres
 	{				
 		//log("15 chiffres ou moins");
 		return pp*qq;
@@ -196,11 +211,8 @@ function stringToArrayBy (str,by) {
 */
 function dCompute(ee,phii) {
 	//TODO
-	if (phi<999999)	
-	return dComputeEasy(ee,phii);
+	if (phi<999999)	return dComputeEasy(ee,phii);
 	else return extendedEuclide(ee,phii); 
-	
-	
 }
 // Best way to find 'd' :
 function extendedEuclide(a,b) {
@@ -242,7 +254,7 @@ function cipher (arr,ee,nn) {
 	var arrOut=[];	
 	for (var i in arr) {
 		if (ee<MAX_POW) {
-			arrOut.push (new BigNumber(arr[i].toString()).pow(ee).mod(nn).toFixed()) ; // arrOut.push (Math.pow(arr[i],ee)%nn ) ;
+			arrOut.push (new BigNumber(arr[i].toString()).pow(ee).mod(nn).toFixed()) ; // arrOut.push ( Math.pow(arr[i],ee)%nn ) ;
 			//log("pow "+ee+" ="+new BigNumber(arr[i]).pow(ee).toFixed());
 		}		
 		else arrOut.push(powMod(arr[i],ee,nn));	
@@ -267,8 +279,8 @@ function uncipher (arr,dd,nn) {
 * @param nn		Number n (p*q)
 * @return 		output char (ciphered or unciphered)
 */
-function powMod (ic,ed,nn) {	
-	// TODO
+function powMod (ic,ed,nn) {
+	// To Explain
 	var oc=1;	
 	ed=new BigNumber(ed.toString());
 	ic=new BigNumber(ic.toString());
@@ -310,16 +322,15 @@ function toUnicode(str) {
 	}
 	return str;
 }
-//util func
-
+//
+//util functions
 function log (o="") {
 	$("info").innerHTML+=o+"<br/>";
 }
-
 function logArr (arr) {
 	if(arr.length==0) log(">> vide !");
 	for (var i in arr) {
-		log(" ["+arr[i]+"]");
+		log("&nbsp;&nbsp; ["+arr[i]+"]");
 	}	
 }
 function $ (id) { 
