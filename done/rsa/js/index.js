@@ -4,7 +4,7 @@ BigNumber.config({ POW_PRECISION: 0 }) ; // No limit of significative digits
 //
 //
 // vars declaration
-const MAX_POW=9999;
+const MAX_POW=10000;
 const START_E= 788 ; // 788; // 3 ; 
 //
 var n,phi,e,d,plainTxt,arrBy,cipherArr;
@@ -146,7 +146,7 @@ function primeOf(phii,min=0) {
 	min=Math.abs(min); if (min<3) min=3; var gcdPhi;
 	if (min>=phii) error("Minimum for e : "+min+" is greater than phi : "+phii+" !"); 
 	// TODO
-	if (phi<999999) gcdPhi=easyGCD ; else gcdPhi=GCD ;
+	if (phi<1000000) gcdPhi=easyGCD ; else gcdPhi=GCD ;
 	for (var ee=min;ee<phii;ee++) {
 		if (gcdPhi(phii,ee)==1) break;
 	}
@@ -208,7 +208,7 @@ function stringToArrayBy (str,by) {
 */
 function dCompute(ee,phii) {
 	//TODO
-	if (phi<999999)	return dComputeEasy(ee,phii);
+	if (phi<1000000)	return dComputeEasy(ee,phii);
 	else return extendedEuclide(ee,phii); 
 }
 // Best way to find 'd' :
