@@ -5,7 +5,7 @@ BigNumber.config({ POW_PRECISION: 0 }) ; // No limit of significative digits
 //
 // vars declaration
 const MAX_POW=9999;
-const START_E= 788 ; // 788; // 3 ; // 998456129339 //
+const START_E= 788 ; // 788; // 3 ; 
 //
 var n,phi,e,d,plainTxt,arrBy,cipherArr;
 var p,q;
@@ -117,7 +117,7 @@ function aliceReceive (evt) {
 */
 function computeN (pp,qq) {
 	// TODO
-	if (pp*qq<1000000000000000) // <1 000 000 000 000 000 soit pas plus de 15 chiffres
+	if (pp*qq<1000000000000000) // soit pas plus de 15 chiffres
 	{				
 		//log("15 chiffres ou moins");
 		return pp*qq;
@@ -133,8 +133,8 @@ function computeN (pp,qq) {
 */
 function phiOf (pp,qq) {
 	// TODO
-	if ((pp-1)*(qq-1)<99999999999999) return (pp-1)*(qq-1);		
-	else return (new BigNumber(pp.toString()).minus(1).times(new BigNumber(qq.toString()).minus(1))).toFixed();
+	if ((pp-1)*(qq-1)<100000000000000) return (pp-1)*(qq-1); //	soit pas plus de 14 chiffres	
+	else return new BigNumber(pp.toString()).minus(1).times(new BigNumber(qq.toString()).minus(1)).toFixed(); 
 }
 /**
 * Creation of number e used to cipher
@@ -162,20 +162,17 @@ function easyGCD (a,b) {
 	// TODO
     while (a != b) {
         if (a > b) {
-			a-=b ; // log("a>b => a=a-b : "+a+"-"+b+" ="+(a-=b)); 
-			//a = a - b ; // a-=b ; //
+			a-=b ; // log("a>b => a=a-b : "+a+"-"+b+" ="+(a-=b)); // a=a-b; //			
 		}
         else {
-			b-=a ; // log("a<=b => b=b-a: "+b+"-"+a+" ="+(b-=a)); 
-			// b=b-a; // b-=a ; //
-			
+			b-=a ; // log("a<=b => b=b-a: "+b+"-"+a+" ="+(b-=a)); // b=b-a;  //			
 		}
 	}	
 	//log("a=b=pgcd="+a);
     return a;
 }
 function GCD (a,b) {
-	// TODO	
+	// To Explain
 	var r=a%b;	
 	while (r!=0) {
 		a=b;	
