@@ -142,11 +142,11 @@ function phiOf (pp,qq) {
 * @param min	Start value for e	
 * @return the e number
 */
-function primeOf(phii,min=0) {
+function primeOf(phii,min=3) {
 	min=Math.abs(min); if (min<3) min=3; var gcdPhi;
 	if (min>=phii) error("Minimum for e : "+min+" is greater than phi : "+phii+" !"); 
 	// TODO
-	if (phi<1000000) gcdPhi=easyGCD ; else gcdPhi=GCD ;
+	if (phi<100000000000) gcdPhi=easyGCD ; else gcdPhi=GCD ;
 	for (var ee=min;ee<phii;ee++) {
 		if (gcdPhi(phii,ee)==1) break;
 	}

@@ -4,7 +4,7 @@ BigNumber.config({ POW_PRECISION: 0 }) ; // No limit of significative digits
 //
 //
 // vars declaration
-const MAX_POW=9999;
+const MAX_POW=10000;
 const START_E= 788 ; // 788; // 3 ; 
 //
 var n,phi,e,d,plainTxt,arrBy,cipherArr;
