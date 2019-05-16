@@ -9,7 +9,7 @@ const START_E= 788 ; // 788; // 3 ;
 //
 var n,phi,e,d,plainTxt,arrBy,cipherArr;
 var p,q;
-p=989456129273 ; q=989456129339 ; by=6 ;  
+p=989456129273 ; q=989456129339 ; by=6 ;
 //
 // p=67 ; q=71 ; const by=1 ;
 //
